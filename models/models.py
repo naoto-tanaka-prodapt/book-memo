@@ -1,8 +1,9 @@
-import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Column, DateTime, Enum, ForeignKey, Integer, String, Text, Date
 from sqlalchemy.orm import declarative_base, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 import enum
+from config import settings
 
 Base = declarative_base()
 
@@ -19,12 +20,14 @@ class ReadingStatus(enum.Enum):
 # ----------------------------------------
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = {"schema": settings.SCHEMA_NAME}
 
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
     created_at = Column(
-        DateTime, default=datetime.utcnow
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc)
     )
 
 # ----------------------------------------
@@ -32,6 +35,7 @@ class User(Base):
 # ----------------------------------------
 class Book(Base):
     __tablename__ = "books"
+    __table_args__ = {"schema": settings.SCHEMA_NAME}
 
     id = Column(Integer, primary_key=True)
     title = Column(String, nullable=False)
@@ -40,7 +44,8 @@ class Book(Base):
     cover_url = Column(String)
 
     created_at = Column(
-        DateTime, default=datetime.utcnow
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc)
     )
 
 # ----------------------------------------
@@ -48,15 +53,16 @@ class Book(Base):
 # ----------------------------------------
 class UserBook(Base):
     __tablename__ = "user_books"
+    __table_args__ = {"schema": settings.SCHEMA_NAME}
 
     id = Column(Integer, primary_key=True)
 
     user_id = Column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+        ForeignKey(f"{settings.SCHEMA_NAME}.users.id", ondelete="CASCADE"),
         nullable=False
     )
     book_id = Column(
-        ForeignKey("books.id", ondelete="CASCADE"),
+        ForeignKey(f"{settings.SCHEMA_NAME}.books.id", ondelete="CASCADE"),
         nullable=False
     )
 
@@ -80,11 +86,12 @@ class UserBook(Base):
     note = Column(Text)
 
     created_at = Column(
-        DateTime, default=datetime.utcnow
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc)
     )
     updated_at = Column(
         DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow
+        default=datetime.now(timezone.utc),
+        onupdate=datetime.now(timezone.utc)
     )
 

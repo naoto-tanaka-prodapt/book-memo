@@ -7,3 +7,7 @@ Template to deploy a simple Python FastAPI project to Render
 > pip install -r requirements.txt
 > fastapi dev main.py
 ```
+
+```
+CREATE SCHEMA bookmemo AUTHORIZATION postgres;
+```
